@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
 
 const questions = [
   {
@@ -35,9 +36,11 @@ const questions = [
   },
 ];
 
-const green = "#2a9d8f";
+const primaryColor = "#2C6E49";
+const bgColor = "#EBE9E3";
 
-const Questionnaire = ({ navigation }) => {
+const Questionnaire = () => {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
 
@@ -58,10 +61,9 @@ const Questionnaire = ({ navigation }) => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      console.log("User answers:", answers);
-      // TODO: submit answers or navigate somewhere
-      // Example: navigate to home or summary screen
-      navigation.navigate("Home");
+      // Here you can process answers or send to backend before navigation
+      alert("User answers: " + JSON.stringify(answers, null, 2));
+      router.push("/home"); // Navigate to Home screen (adjust path if needed)
     }
   };
 
@@ -81,8 +83,8 @@ const Questionnaire = ({ navigation }) => {
               style={[
                 styles.option,
                 {
-                  borderColor: isSelected ? green : "#ccc",
-                  backgroundColor: isSelected ? green : "#f5f5f5",
+                  borderColor: isSelected ? primaryColor : "#ccc",
+                  backgroundColor: isSelected ? primaryColor : "#F3F5F9",
                 },
               ]}
             >
@@ -99,7 +101,7 @@ const Questionnaire = ({ navigation }) => {
         disabled={isNextDisabled}
         style={[
           styles.nextButton,
-          { backgroundColor: isNextDisabled ? "#aaa" : green },
+          { backgroundColor: isNextDisabled ? "#aaa" : primaryColor },
         ]}
       >
         <Text style={styles.nextButtonText}>
@@ -116,30 +118,31 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 24,
-    backgroundColor: "#fff",
+    backgroundColor: bgColor,
     justifyContent: "center",
   },
   question: {
     fontWeight: "600",
-    fontSize: 24,
+    fontSize: 22,
     marginBottom: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: "#eee",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
     paddingBottom: 10,
-    color: "#222",
+    color: "#2C6E49",
+    textAlign: "center",
   },
   optionsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 14, // gap is not supported in RN, use margin
     marginBottom: 30,
+    justifyContent: "center",
   },
   option: {
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: 30,
     borderWidth: 2,
-    marginRight: 14,
+    marginRight: 12,
     marginBottom: 14,
     minWidth: 130,
     alignItems: "center",
@@ -151,6 +154,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 30,
     alignItems: "center",
+    marginTop: 10,
   },
   nextButtonText: {
     color: "#fff",

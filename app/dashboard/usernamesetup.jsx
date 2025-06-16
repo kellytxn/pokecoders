@@ -1,161 +1,101 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { useRouter } from "expo-router";
 
-const questions = [
-  {
-    question: "What ethical practices matter most to you?",
-    options: [
-      "Fair Labor",
-      "Carbon Footprint",
-      "Supply Chain Transparency",
-      "Animal Welfare",
-      "Recycled Materials",
-    ],
-  },
-  {
-    question: "Which fabric materials do you prefer?",
-    options: [
-      "Organic Cotton",
-      "Recycled Polyester",
-      "Hemp",
-      "Linen",
-      "Conventional Cotton",
-      "Polyester",
-      "Wool",
-      "Leather",
-    ],
-  },
-  {
-    question: "Are there any deal breakers for you?",
-    options: [
-      "Animal Products",
-      "Synthetic Virgin Polyester",
-      "Non-transparent Sourcing",
-    ],
-  },
-];
-
-const primaryColor = "#2C6E49";
-const bgColor = "#EBE9E3";
-
-const Questionnaire = ({ navigation }) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState({});
-
-  const { question, options } = questions[currentStep];
-
-  const toggleOption = (option) => {
-    setAnswers((prev) => {
-      const selected = prev[currentStep] || [];
-      const isSelected = selected.includes(option);
-      const updated = isSelected
-        ? selected.filter((o) => o !== option)
-        : [...selected, option];
-      return { ...prev, [currentStep]: updated };
-    });
-  };
+const UsernameSetup = () => {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
 
   const handleNext = () => {
-    if (currentStep < questions.length - 1) {
-      setCurrentStep(currentStep + 1);
+    const trimmed = username.trim();
+    if (trimmed.length > 0) {
+      router.push("/questionnaire");
     } else {
-      console.log("User answers:", answers);
-      navigation.navigate("Home");
+      alert("Please enter a username");
     }
   };
 
-  const isNextDisabled = !answers[currentStep] || answers[currentStep].length === 0;
+  const isDisabled = username.trim().length === 0;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.question}>{question}</Text>
-
-      <View style={styles.optionsContainer}>
-        {options.map((option) => {
-          const isSelected = (answers[currentStep] || []).includes(option);
-          return (
-            <Pressable
-              key={option}
-              onPress={() => toggleOption(option)}
-              style={[
-                styles.option,
-                {
-                  borderColor: isSelected ? primaryColor : "#ccc",
-                  backgroundColor: isSelected ? primaryColor : "#F3F5F9",
-                },
-              ]}
-            >
-              <Text style={[styles.optionText, { color: isSelected ? "#fff" : "#333" }]}>
-                {option}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <Text style={styles.label}>Choose your username</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Your username"
+        placeholderTextColor="#999"
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
       <Pressable
         onPress={handleNext}
-        disabled={isNextDisabled}
-        style={[
-          styles.nextButton,
-          { backgroundColor: isNextDisabled ? "#aaa" : primaryColor },
+        disabled={isDisabled}
+        style={({ pressed }) => [
+          styles.button,
+          pressed && !isDisabled && styles.pressedButton,
+          isDisabled && styles.disabledButton,
         ]}
       >
-        <Text style={styles.nextButtonText}>
-          {currentStep === questions.length - 1 ? "Finish" : "Next"}
-        </Text>
+        <Text style={styles.buttonText}>Next</Text>
       </Pressable>
-    </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
-export default Questionnaire;
+export default UsernameSetup;
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 24,
-    backgroundColor: bgColor,
+    flex: 1,
+    backgroundColor: "#EBE9E3",
     justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 40,
   },
-  question: {
-    fontWeight: "600",
-    fontSize: 22,
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingBottom: 10,
+  label: {
+    fontSize: 20,
     color: "#2C6E49",
-    textAlign: "center",
+    marginBottom: 15,
+    fontWeight: "bold",
   },
-  optionsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 30,
-    justifyContent: "center",
-  },
-  option: {
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 30,
-    borderWidth: 2,
-    marginRight: 12,
-    marginBottom: 14,
-    minWidth: 130,
-    alignItems: "center",
-  },
-  optionText: {
-    fontWeight: "500",
-  },
-  nextButton: {
-    paddingVertical: 14,
-    borderRadius: 30,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  nextButtonText: {
-    color: "#fff",
-    fontWeight: "700",
+  input: {
+    width: "100%",
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#F3F5F9",
     fontSize: 16,
+    color: "#333",
+    marginBottom: 30,
+  },
+  button: {
+    backgroundColor: "#2C6E49",
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  pressedButton: {
+    backgroundColor: "#245B3A",
+  },
+  disabledButton: {
+    backgroundColor: "#999",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });

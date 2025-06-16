@@ -1,9 +1,12 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";  // <-- import useRouter
 
-const Welcome = ({ navigation }) => {
+const Welcome = () => {
+  const router = useRouter();
+
   const handleStart = () => {
-    navigation.navigate("UsernameSetup");
+    router.push("/usernamesetup");
   };
 
   return (
