@@ -1,41 +1,52 @@
+import React from "react";
 import {
   StyleSheet,
   Text,
   View,
   Image,
   Pressable,
-  SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
 
-const Landing = () => {
+const Index = () => {
   const router = useRouter();
+
+  const handleStart = () => {
+    router.push("/usernamesetup");
+  };
 
   return (
     <View style={styles.container}>
       <Image source={require("../assets/logo.jpg")} style={styles.logo} />
 
-      <View style={styles.linkContainer}>
-        <Pressable
-          onPress={() => router.push("/home")}
-          style={({ pressed }) => [styles.box, pressed && styles.pressedBox]}
-          hitSlop={20}
-        >
-          <Text style={styles.linkText}>Continue</Text>
-        </Pressable>
-      </View>
+      <Text style={styles.title}>Welcome to Pokecoders</Text>
+      <Text style={styles.subtitle}>
+        Discover ethical fashion tailored to you
+      </Text>
+
+      <Pressable
+        onPress={handleStart}
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.pressedButton,
+        ]}
+        hitSlop={20}
+      >
+        <Text style={styles.buttonText}>Get Started</Text>
+      </Pressable>
     </View>
   );
 };
 
-export default Landing;
+export default Index;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#EBE9E3",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#EBE9E3",
+    paddingHorizontal: 40,
   },
   logo: {
     width: 250,
@@ -43,21 +54,34 @@ const styles = StyleSheet.create({
     borderRadius: 125,
     marginBottom: 40,
   },
-  linkContainer: {
-    gap: 20,
-    alignItems: "center",
-  },
-  box: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    alignItems: "center",
-    width: 200,
-  },
-  linkText: {
-    fontSize: 18,
-    color: "#333",
+  title: {
+    fontSize: 32,
     fontWeight: "bold",
+    color: "#2C6E49",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 40,
+    textAlign: "center",
+    lineHeight: 22,
+    maxWidth: 300,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: "#2C6E49",
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 12,
+  },
+  pressedButton: {
+    backgroundColor: "#245B3A",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });

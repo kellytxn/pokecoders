@@ -61,9 +61,8 @@ const Questionnaire = () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Here you can process answers or send to backend before navigation
-      alert("User answers: " + JSON.stringify(answers, null, 2));
-      router.push("/home"); // Navigate to Home screen (adjust path if needed)
+      // After finishing questionnaire, navigate to the shopping tab
+      router.push("/shopping");
     }
   };
 
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     paddingBottom: 10,
-    color: "#2C6E49",
+    color: primaryColor,
     textAlign: "center",
   },
   optionsContainer: {
