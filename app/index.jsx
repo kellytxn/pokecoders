@@ -1,12 +1,19 @@
-import { StyleSheet, Text, View, Image, Pressable } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Pressable,
+  SafeAreaView,
+} from "react-native";
 import { useRouter } from "expo-router";
 
-const Home = () => {
+const Landing = () => {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/icon.png")} style={styles.logo} />
+      <Image source={require("../assets/logo.jpg")} style={styles.logo} />
 
       <View style={styles.linkContainer}>
         <Pressable
@@ -21,16 +28,10 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Landing;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#EBE9E3",
-  },
-  loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   box: {
-    backgroundColor: "#F3F5F9",
+    backgroundColor: "white",
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 30,
