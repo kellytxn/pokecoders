@@ -11,7 +11,7 @@ export default function DashboardLayout() {
           paddingTop: 10,
           height: 90,
         },
-        tabBarActiveTintColor: "#DFB6CF",
+        tabBarActiveTintColor: "#2C6E49",
         tabBarInactiveTintColor: "#FFF",
       }}
     >
@@ -23,21 +23,7 @@ export default function DashboardLayout() {
             <Ionicons
               size={24}
               name="cart"
-              color={focused ? "#DFB6CF" : "#FFF"}
-            />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ focused }) => (
-            <Ionicons
-              size={24}
-              name="home"
-              color={focused ? "#DFB6CF" : "#FFF"}
+              color={focused ? "#2C6E49" : "#FFF"}
             />
           ),
         }}
@@ -51,7 +37,7 @@ export default function DashboardLayout() {
             <Ionicons
               size={24}
               name="gift"
-              color={focused ? "#DFB6CF" : "#FFF"}
+              color={focused ? "#2C6E49" : "#FFF"}
             />
           ),
         }}
