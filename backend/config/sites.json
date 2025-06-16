@@ -1,0 +1,17 @@
+{
+  "reformation": {
+    "list_url":      "https://www.thereformation.com/clothing",
+    "product_tile":  "div.product-tile",                                   
+    "url":           "a.product-tile__anchor[itemprop='url']",  
+    "title":         "div.product-tile__body-section.product-tile__name[itemprop='name']",
+    "image":         "img[itemprop='image']",
+    "price":         "span.value[itemprop='price']"
+  },
+  "patagonia": {
+    "list_url":     "https://www.patagonia.com/shop/mens-jackets",
+    "product_tile": "product-tile.product-tile",  
+    "url":          "a[itemprop='url']",          
+    "image_meta":   "meta[itemprop='image']"      
+  }   
+}
+
