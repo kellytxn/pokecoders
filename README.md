@@ -71,11 +71,16 @@ PokeCoders is a mobile app that helps users make ethical fashion choices by rati
 
    ```
 
-3. Create .env files in backend folder with your configuration (e.g., MongoDB URI.)
+3. Create a .env file in the backend folder with your configuration
+   Add the following to your .env file:
+
+MONGO_URI=mongodb+srv://pokecoders:pokecoders123@fanryan.vvb74qj.mongodb.net/pokecodersdb?retryWrites=true&w=majority&appName=fanryan
+PORT=3001
 
 4. Start the backend server:
 
    ```bash
+   cd backend
    node server.js
 
    ```
@@ -119,15 +124,17 @@ export const BACKEND_URL = "http://192.168.10.141:3001";
 Run the app on a device or emulator via Expo Go.
 
 On a physical phone:
--Download and open Expo Go app on your phone.
--Scan the QR code displayed in your terminal or Expo DevTools.
--Make sure your phone and computer are connected to the same Wi-Fi network.
--Your app will load and run on your phone.
+
+- Download and open Expo Go app on your phone.
+- Scan the QR code displayed in your terminal or Expo DevTools.
+- Make sure your phone and computer are connected to the same Wi-Fi network.
+- Your app will load and run on your phone.
 
 On an emulator:
--In Expo DevTools, click Run on iOS simulator or Run on Android emulator.
--The app will launch in the chosen simulator/emulator on your computer.
--No need for a QR code or Expo Go app for this method.
+
+- In Expo DevTools, click Run on iOS simulator or Run on Android emulator.
+- The app will launch in the chosen emulator on your computer.
+- No need for a QR code or Expo Go app for this method.
 
 Complete onboarding questionnaire to personalise preferences.
 
