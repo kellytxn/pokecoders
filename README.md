@@ -9,11 +9,9 @@ An ethical shopping and rewards platform that rates fashion products based on su
 - [About](#about)  
 - [Features](#features)  
 - [Tech Stack](#tech-stack)  
-- [Getting Started](#getting-started)  
-- [Project Structure](#project-structure)  
+- [Getting Started](#getting-started)
 - [Usage](#usage)  
-- [Contributing](#contributing)  
-- [License](#license)  
+- [Project Structure](#project-structure)  
 
 ---
 
