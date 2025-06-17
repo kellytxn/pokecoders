@@ -7,83 +7,16 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  Alert,
 } from "react-native";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import axios from "axios";
 import { computeSustainabilityScore } from "../../utils/scorer";
+import { recommendedProducts } from "../../context/products";
+import { UserContext } from "../../context/UserContext";
 
 const { width } = Dimensions.get("window");
-
-const recommendedProducts = [
-  {
-    id: "1",
-    name: "Cotton Shirt",
-    price: "$24.99",
-    image:
-      "https://images.unsplash.com/photo-1617137968427-85924c800a22?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    fabricComposition: ["Organic Cotton", "Polyester"],
-    ethicalCauses: ["Fair Labor"],
-    dealBreakers: [],
-  },
-  {
-    id: "2",
-    name: "Jeans",
-    price: "$39.99",
-    image:
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    fabricComposition: ["Conventional Cotton"],
-    ethicalCauses: ["Recycled Materials"],
-    dealBreakers: [],
-  },
-  {
-    id: "3",
-    name: "Leather Jacket",
-    price: "$99.99",
-    image:
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    fabricComposition: ["Leather"],
-    ethicalCauses: [],
-    dealBreakers: ["Animal Products"],
-  },
-  {
-    id: "4",
-    name: "Polyester Tshirt",
-    price: "$9.99",
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    fabricComposition: ["Polyester"],
-    ethicalCauses: [],
-    dealBreakers: ["Synthetic Virgin Polyester"],
-  },
-  {
-    id: "5",
-    name: "Silk Blouse",
-    price: "$49.99",
-    image:
-      "https://images.unsplash.com/photo-1581044777550-4cfa60707c03?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    fabricComposition: ["Silk"],
-    ethicalCauses: ["Women Empowerment"],
-    dealBreakers: [],
-  },
-  {
-    id: "6",
-    name: "Wool Coat",
-    price: "$149.99",
-    image:
-      "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    fabricComposition: ["Wool"],
-    ethicalCauses: [],
-    dealBreakers: ["Animal Products"],
-  },
-  {
-    id: "7",
-    name: "Denim shirt",
-    price: "$34.99",
-    image:
-      "https://images.unsplash.com/photo-1589310243389-96a5483213a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    fabricComposition: ["Conventional Cotton", "Recycled Polyester"],
-    ethicalCauses: ["Fair Labor", "Eco-Friendly Dye"],
-    dealBreakers: [],
-  },
-];
+const BACKEND_URL = "http://192.168.10.141:3001";
 
 function getScoreColor(score) {
   if (score <= 1.5) return "#e57373";   // soft red - poor
@@ -93,6 +26,94 @@ function getScoreColor(score) {
 }
 
 const Shopping = () => {
+  const { user } = useContext(UserContext);
+  const userId = user?.id;
+  const [products, setProducts] = useState(recommendedProducts);
+  const [viewTimers, setViewTimers] = useState({});
+
+
+  const trackBehaviour = async (action, productId) => {
+    try {
+      const SCORE_WEIGHTS = {
+        VIEW_3S: 1,
+        CLICK: 2,
+        VIEW_10S: 3,
+        ADD_TO_CART: 5,
+        PURCHASE: 10
+      };
+
+      const response = await axios.post(`${BACKEND_URL}/api/score/updateScore`, {
+        userId: userId,
+        productId: productId,
+        scoreValue: SCORE_WEIGHTS[action],
+      });
+    } catch (error) {
+      console.error("Error updating score:", error);
+      Alert.alert("Error", "Failed to update scores");
+    }
+  }
+
+  const handleProductPress = (productId) => {
+    trackBehaviour("CLICK", productId);
+
+    // TO BE WRITTEN: PRODUCT DETAIL SCREEN AFTER CLICKING INTO PRODUCT
+  }
+
+  const handleAddToCart = (productId) => {
+    trackBehaviour("ADD_TO_CART", productId);
+
+    // TO BE WRITTEN: SCREEN AFTER CLICKING ADD TO CART
+  }
+
+  const sortedProducts = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/score/products/${userId}`);
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      Alert.alert("Error", "Failed to load products");
+    }
+  }
+
+  useEffect(() => {
+    sortedProducts();
+  }, [userId]);
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      sortedProducts();
+    }, [userId])
+  );
+
+  useEffect(() => {
+    const timers = {};
+    
+    products.forEach(product => {
+      timers[product.id] = {
+        3: setTimeout(() => trackBehaviour("VIEW_3S", product.id), 3000),
+        10: setTimeout(() => trackBehaviour("VIEW_10S", product.id), 10000)
+      };
+    });
+    
+    setViewTimers(timers);
+    
+    return () => {
+      Object.values(timers).forEach(timerObj => {
+        clearTimeout(timerObj[3]);
+        clearTimeout(timerObj[10]);
+      });
+    };
+  }, [products]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(viewTimers).forEach(timerObj => {
+        clearTimeout(timerObj[3]);
+        clearTimeout(timerObj[10]);
+      });
+    };
+  }, [products]);
+
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView style={styles.header}>
@@ -100,38 +121,46 @@ const Shopping = () => {
       </SafeAreaView>
 
       <View style={styles.productsGrid}>
-        {recommendedProducts.map((product) => {
+        {products.map((product) => {
           const sustainabilityScore = computeSustainabilityScore(product);
 
           return (
-            <TouchableOpacity
-              key={product.id}
-              style={styles.productCard}
-              activeOpacity={0.8}
-            >
-              <Image
-                source={{ uri: product.image }}
-                style={styles.productImage}
-              />
-              <View style={styles.productDetails}>
-                <Text style={styles.productName} numberOfLines={1}>
-                  {product.name}
-                </Text>
-                <View style={styles.priceRatingContainer}>
-                  <Text style={styles.productPrice}>{product.price}</Text>
-                  <View
-                    style={[
-                      styles.ratingContainer,
-                      { backgroundColor: getScoreColor(sustainabilityScore) },
-                    ]}
-                  >
-                    <Text style={styles.ratingText}>
-                      🌿 {sustainabilityScore}/5
-                    </Text>
+            <View key={product.id} style={styles.productCard}>
+              <TouchableOpacity
+                onPress={() => handleProductPress(product.id)}
+                activeOpacity={0.8}
+              >
+                <Image
+                  source={{ uri: product.image }}
+                  style={styles.productImage}
+                />
+                <View style={styles.productDetails}>
+                  <Text style={styles.productName} numberOfLines={1}>
+                    {product.name}
+                  </Text>
+                  <View style={styles.priceRatingContainer}>
+                    <Text style={styles.productPrice}>{product.price}</Text>
+                    <View
+                      style={[
+                        styles.ratingContainer,
+                        { backgroundColor: getScoreColor(sustainabilityScore) },
+                      ]}
+                    >
+                      <Text style={styles.ratingText}>
+                        🌿 {sustainabilityScore}/5
+                      </Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.addToCartButton}
+                onPress={() => handleAddToCart(product.id)}
+              >
+                <Text style={styles.addToCartText}>Add to Cart</Text>
+              </TouchableOpacity>
+            </View>
           );
         })}
       </View>
@@ -209,5 +238,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     color: "#2d3436",
+  },
+  addToCartButton: {
+    backgroundColor: '#e17055',
+    padding: 8,
+    alignItems: 'center',
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  addToCartText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
