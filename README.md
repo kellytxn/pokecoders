@@ -10,6 +10,7 @@ An ethical shopping and rewards platform that rates fashion products based on su
 - [Features](#features)  
 - [Tech Stack](#tech-stack)  
 - [Getting Started](#getting-started)
+- [Configuration (Important!)](#configuration-important)
 - [Usage](#usage)  
 - [Project Structure](#project-structure)  
 
@@ -79,6 +80,36 @@ PokeCoders is a mobile app that helps users make ethical fashion choices by rati
    ```bash
    cd pokecoders
    npx expo start
+## Configuration (Important!)
+
+To connect your local frontend with your local backend server, you must manually update the IP address in the following files:
+
+### Files to update:
+- `app/(auth)/UsernameSetup.js`  
+- `app/(auth)/Questionnaire.js`
+
+### What to change:
+
+Search for this line or similar in both files:
+
+```js
+const response = await fetch("http://192.168.18.13:3001/api/preferences/", {
+```
+
+Change the IP (`192.168.18.13`) to your own **local IP address** (on the same WiFi network). You can find it with:
+
+```bash
+ifconfig      # macOS/Linux  
+ipconfig      # Windows
+```
+
+**For example:**
+
+```js
+const response = await fetch("http://192.168.1.5:3001/api/preferences/", {
+```
+
+> ✅ **Tip:** Consider using a global config file or environment variable to avoid hardcoding IP addresses across multiple files.
 
 ## Usage
 
