@@ -19,13 +19,13 @@ An ethical shopping and rewards platform that rates fashion products based on su
 
 ## About
 
-pokecoders is a mobile app that helps users make ethical fashion choices by rating products based on sustainability metrics. Users earn reward points for purchases, especially for highly rated products, and can redeem these points to promote ongoing engagement.
+PokeCoders is a mobile app that helps users make ethical fashion choices by rating products based on sustainability metrics. Users earn reward points for purchases, especially for highly rated products, and can redeem these points to promote ongoing engagement.
 
 ---
 
 ## Features
 
-- User authentication and onboarding questionnaire for personalized preferences  
+- Onboarding questionnaire for personalised preferences  
 - Sustainability scoring algorithm considering fabric, ethical causes, and deal breakers  
 - Shopping feed with product ratings and recommendations  
 - Receipt scanning for offline purchase points  
