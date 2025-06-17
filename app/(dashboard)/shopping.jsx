@@ -8,11 +8,14 @@ import {
   Dimensions,
   SafeAreaView,
   Alert,
+  Linking
 } from "react-native";
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import axios from "axios";
 import { computeSustainabilityScore } from "../../utils/scorer";
-import { recommendedProducts } from "../../context/products";
+import { allProducts } from "../../context/products";
 import { UserContext } from "../../context/UserContext";
 
 const { width } = Dimensions.get("window");
@@ -25,14 +28,17 @@ function getScoreColor(score) {
   return "#64b5f6";                     // light blue - excellent
 }
 
-const Shopping = () => {
+// Shopping List Screen
+const ShoppingList = ({ navigation }) => {
   const { user } = useContext(UserContext);
   const userId = user?.id;
-  const [products, setProducts] = useState(recommendedProducts);
+  const [products, setProducts] = useState(allProducts);
   const [viewTimers, setViewTimers] = useState({});
 
 
   const trackBehaviour = async (action, productId) => {
+    if (!userId) return;
+
     try {
       const SCORE_WEIGHTS = {
         VIEW_3S: 1,
@@ -42,7 +48,7 @@ const Shopping = () => {
         PURCHASE: 10
       };
 
-      const response = await axios.post(`${BACKEND_URL}/api/score/updateScore`, {
+      await axios.post(`${BACKEND_URL}/api/score/updateScore`, {
         userId: userId,
         productId: productId,
         scoreValue: SCORE_WEIGHTS[action],
@@ -53,19 +59,9 @@ const Shopping = () => {
     }
   }
 
-  const handleProductPress = (productId) => {
-    trackBehaviour("CLICK", productId);
-
-    // TO BE WRITTEN: PRODUCT DETAIL SCREEN AFTER CLICKING INTO PRODUCT
-  }
-
-  const handleAddToCart = (productId) => {
-    trackBehaviour("ADD_TO_CART", productId);
-
-    // TO BE WRITTEN: SCREEN AFTER CLICKING ADD TO CART
-  }
-
   const sortedProducts = async () => {
+    if (!userId) return;
+
     try {
       const response = await axios.get(`${BACKEND_URL}/api/score/products/${userId}`);
       setProducts(response.data);
@@ -74,16 +70,22 @@ const Shopping = () => {
       Alert.alert("Error", "Failed to load products");
     }
   }
+  
+  const handleProductPress = (product) => {
+    trackBehaviour("CLICK", product.id);
+    navigation.navigate("ProductDetail", { product });
+  }
+
+  const handleAddToCart = (productId) => {
+    trackBehaviour("ADD_TO_CART", productId);
+    Alert.alert("Added to Cart", "Item has been added to your cart");
+
+    // TO BE WRITTEN: SCREEN AFTER CLICKING ADD TO CART
+  }
 
   useEffect(() => {
     sortedProducts();
   }, [userId]);
-  
-  useFocusEffect(
-    React.useCallback(() => {
-      sortedProducts();
-    }, [userId])
-  );
 
   useEffect(() => {
     const timers = {};
@@ -114,6 +116,7 @@ const Shopping = () => {
     };
   }, [products]);
 
+
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView style={styles.header}>
@@ -127,7 +130,7 @@ const Shopping = () => {
           return (
             <View key={product.id} style={styles.productCard}>
               <TouchableOpacity
-                onPress={() => handleProductPress(product.id)}
+                onPress={() => handleProductPress(product)}
                 activeOpacity={0.8}
               >
                 <Image
@@ -165,6 +168,113 @@ const Shopping = () => {
         })}
       </View>
     </ScrollView>
+  );
+};
+
+// Product Detail Screen
+const ProductDetail = ({ route }) => {
+  const { product } = route.params;
+  const sustainabilityScore = computeSustainabilityScore(product);
+
+  const handleBuyPress = () => {
+    // This is a placeholder URL - replace with real purchase link if available
+    Linking.openURL(product.purchaseUrl);
+  };
+
+  return (
+    <ScrollView style={styles.detailContainer}>
+      <Image source={{ uri: product.image }} style={styles.detailImage} />
+
+      <View style={styles.detailContent}>
+        <Text style={styles.detailName}>{product.name}</Text>
+        <Text style={styles.detailPrice}>{product.price}</Text>
+
+        <View style={styles.scoreContainer}>
+          <Text style={styles.sectionTitle}>Sustainability Score</Text>
+          <View
+            style={[
+              styles.scorePill,
+              { backgroundColor: getScoreColor(sustainabilityScore) },
+            ]}
+          >
+            <Text style={styles.scoreText}>{sustainabilityScore}/5</Text>
+          </View>
+        </View>
+
+        <View style={styles.infoSection}>
+          <Text style={styles.sectionTitle}>Fabric Composition</Text>
+          <View style={styles.tagsContainer}>
+            {product.fabricComposition.map((fabric, index) => (
+              <View key={index} style={styles.fabricTag}>
+                <Text style={styles.tagText}>{fabric}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {product.ethicalCauses.length > 0 && (
+          <View style={styles.infoSection}>
+            <Text style={styles.sectionTitle}>Ethical Causes</Text>
+            <View style={styles.tagsContainer}>
+              {product.ethicalCauses.map((cause, index) => (
+                <View key={index} style={styles.causeTag}>
+                  <Text style={styles.tagText}>✓ {cause}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {product.dealBreakers.length > 0 && (
+          <View style={styles.infoSection}>
+            <Text style={styles.sectionTitle}>Potential Concerns</Text>
+            <View style={styles.tagsContainer}>
+              {product.dealBreakers.map((concern, index) => (
+                <View key={index} style={styles.concernTag}>
+                  <Text style={styles.tagText}>⚠️ {concern}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        <TouchableOpacity style={styles.buyButton} onPress={handleBuyPress}>
+          <Text style={styles.buyButtonText}>Buy Now</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+};
+
+const Stack = createStackNavigator();
+
+const Shopping = () => {
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#EBE9E3",
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        headerTintColor: "#2d3436",
+        headerTitleStyle: {
+          fontWeight: "700",
+        },
+      }}
+    >
+      <Stack.Screen
+        name="ShoppingList"
+        component={ShoppingList}
+        options={{ title: "Recommended" }}
+      />
+      <Stack.Screen
+        name="ProductDetail"
+        component={ProductDetail}
+        options={{ title: "Product Details" }}
+      />
+    </Stack.Navigator>
   );
 };
 
@@ -209,6 +319,7 @@ const styles = StyleSheet.create({
     height: 150,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
+    resizeMode: "cover",
   },
   productDetails: {
     padding: 12,
@@ -249,5 +360,102 @@ const styles = StyleSheet.create({
   addToCartText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  // Detail Screen styles
+
+  detailContainer: {
+    flex: 1,
+    backgroundColor: "#EBE9E3",
+  },
+  detailImage: {
+    width: "100%",
+    height: 350,
+    resizeMode: "cover",
+  },
+  detailContent: {
+    padding: 20,
+  },
+  detailName: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#2d3436",
+    marginBottom: 5,
+  },
+  detailPrice: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#e17055",
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#2d3436",
+    marginBottom: 10,
+  },
+  scoreContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+  scorePill: {
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    marginLeft: 15,
+  },
+  scoreText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "white",
+  },
+  infoSection: {
+    marginBottom: 25,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 5,
+  },
+  fabricTag: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  causeTag: {
+    backgroundColor: "#81c784",
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  concernTag: {
+    backgroundColor: "#ffb74d",
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  tagText: {
+    fontSize: 14,
+    color: "#2d3436",
+  },
+  buyButton: {
+    backgroundColor: "#2d3436",
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  buyButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "700",
   },
 });
