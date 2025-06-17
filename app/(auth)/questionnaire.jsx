@@ -1,6 +1,14 @@
-import React, { useState } from "react";
-import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
+import { UserContext } from "../../context/UserContext";
 
 const questions = [
   {
@@ -41,8 +49,17 @@ const bgColor = "#EBE9E3";
 
 const Questionnaire = () => {
   const router = useRouter();
+  const { username } = useContext(UserContext); // get username from context
+
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  if (!username) {
+    // Prevent access without username — fallback to username setup
+    router.replace("/usernamesetup");
+    return null;
+  }
 
   const { question, options } = questions[currentStep];
 
@@ -57,16 +74,43 @@ const Questionnaire = () => {
     });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < questions.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      // After finishing questionnaire, navigate to the shopping tab
-      router.push("/shopping");
+      setCurrentStep((step) => step + 1);
+      return;
+    }
+
+    // Submit final answers
+    setLoading(true);
+    const payload = {
+      userId: username,
+      preferences: answers[0] || [],
+      fabricPreferences: answers[1] || [],
+      dealBreakers: answers[2] || [],
+    };
+
+    try {
+      const response = await fetch("http://192.168.18.13:3001/api/preferences/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        alert("Failed to save preferences. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/(dashboard)/shopping");i
+
+    } catch (error) {
+      alert("Network error. Please try again.");
+      setLoading(false);
     }
   };
 
-  const isNextDisabled = !answers[currentStep] || answers[currentStep].length === 0;
+  const isNextDisabled = !answers[currentStep] || answers[currentStep].length === 0 || loading;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -86,6 +130,7 @@ const Questionnaire = () => {
                   backgroundColor: isSelected ? primaryColor : "#F3F5F9",
                 },
               ]}
+              disabled={loading}
             >
               <Text style={[styles.optionText, { color: isSelected ? "#fff" : "#333" }]}>
                 {option}
@@ -103,9 +148,13 @@ const Questionnaire = () => {
           { backgroundColor: isNextDisabled ? "#aaa" : primaryColor },
         ]}
       >
-        <Text style={styles.nextButtonText}>
-          {currentStep === questions.length - 1 ? "Finish" : "Next"}
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.nextButtonText}>
+            {currentStep === questions.length - 1 ? "Finish" : "Next"}
+          </Text>
+        )}
       </Pressable>
     </ScrollView>
   );

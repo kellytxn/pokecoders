@@ -8,6 +8,7 @@ import {
   Dimensions,
   SafeAreaView,
 } from "react-native";
+import { computeSustainabilityScore } from "../../utils/scorer";
 
 const { width } = Dimensions.get("window");
 
@@ -17,39 +18,50 @@ const recommendedProducts = [
     name: "Cotton Shirt",
     price: "$24.99",
     image:
-      "https://images.unsplash.com/photo-1617137968427-85924c800a22?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-    rating: 4.5,
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    fabricComposition: ["Organic Cotton", "Polyester"],
+    ethicalCauses: ["Fair Labor"],
+    dealBreakers: [],
   },
   {
     id: "2",
     name: "Jeans",
     price: "$39.99",
     image:
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80", // Corrected linen shorts
-    rating: 4.8,
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    fabricComposition: ["Conventional Cotton"],
+    ethicalCauses: ["Recycled Materials"],
+    dealBreakers: [],
   },
   {
     id: "3",
     name: "Leather Jacket",
     price: "$99.99",
     image:
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-    rating: 1.4,
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    fabricComposition: ["Leather"],
+    ethicalCauses: [],
+    dealBreakers: ["Animal Products"],
   },
   {
     id: "4",
     name: "Polyester Tshirt",
     price: "$9.99",
     image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-    rating: 1.1,
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    fabricComposition: ["Polyester"],
+    ethicalCauses: [],
+    dealBreakers: ["Synthetic Virgin Polyester"],
   },
   {
     id: "5",
     name: "Silk Blouse",
     price: "$49.99",
-    image: "https://images.unsplash.com/photo-1581044777550-4cfa60707c03",
-    rating: 4.7,
+    image:
+      "https://images.unsplash.com/photo-1581044777550-4cfa60707c03?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    fabricComposition: ["Silk"],
+    ethicalCauses: ["Women Empowerment"],
+    dealBreakers: [],
   },
   {
     id: "6",
@@ -57,7 +69,9 @@ const recommendedProducts = [
     price: "$149.99",
     image:
       "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    rating: 0.7,
+    fabricComposition: ["Wool"],
+    ethicalCauses: [],
+    dealBreakers: ["Animal Products"],
   },
   {
     id: "7",
@@ -65,9 +79,19 @@ const recommendedProducts = [
     price: "$34.99",
     image:
       "https://images.unsplash.com/photo-1589310243389-96a5483213a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    rating: 4.8,
+    fabricComposition: ["Conventional Cotton", "Recycled Polyester"],
+    ethicalCauses: ["Fair Labor", "Eco-Friendly Dye"],
+    dealBreakers: [],
   },
 ];
+
+function getScoreColor(score) {
+  if (score <= 1.5) return "#e57373";   // soft red - poor
+  if (score <= 3.0) return "#ffb74d";   // warm amber - moderate
+  if (score <= 4.4) return "#81c784";   // fresh green - good
+  return "#64b5f6";                     // light blue - excellent
+}
+
 const Shopping = () => {
   return (
     <ScrollView style={styles.container}>
@@ -76,29 +100,40 @@ const Shopping = () => {
       </SafeAreaView>
 
       <View style={styles.productsGrid}>
-        {recommendedProducts.map((product) => (
-          <TouchableOpacity
-            key={product.id}
-            style={styles.productCard}
-            activeOpacity={0.8}
-          >
-            <Image
-              source={{ uri: product.image }}
-              style={styles.productImage}
-            />
-            <View style={styles.productDetails}>
-              <Text style={styles.productName} numberOfLines={1}>
-                {product.name}
-              </Text>
-              <View style={styles.priceRatingContainer}>
-                <Text style={styles.productPrice}>{product.price}</Text>
-                <View style={styles.ratingContainer}>
-                  <Text style={styles.ratingText}>★ {product.rating}</Text>
+        {recommendedProducts.map((product) => {
+          const sustainabilityScore = computeSustainabilityScore(product);
+
+          return (
+            <TouchableOpacity
+              key={product.id}
+              style={styles.productCard}
+              activeOpacity={0.8}
+            >
+              <Image
+                source={{ uri: product.image }}
+                style={styles.productImage}
+              />
+              <View style={styles.productDetails}>
+                <Text style={styles.productName} numberOfLines={1}>
+                  {product.name}
+                </Text>
+                <View style={styles.priceRatingContainer}>
+                  <Text style={styles.productPrice}>{product.price}</Text>
+                  <View
+                    style={[
+                      styles.ratingContainer,
+                      { backgroundColor: getScoreColor(sustainabilityScore) },
+                    ]}
+                  >
+                    <Text style={styles.ratingText}>
+                      🌿 {sustainabilityScore}/5
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </ScrollView>
   );
@@ -166,7 +201,6 @@ const styles = StyleSheet.create({
     color: "#e17055",
   },
   ratingContainer: {
-    backgroundColor: "#fdcb6e",
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -174,16 +208,6 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 12,
     fontWeight: "700",
-    color: "white",
-  },
-  contentSection: {
-    padding: 20,
-    paddingTop: 0,
-  },
-  contentTitle: {
-    fontSize: 20,
-    fontWeight: "700",
     color: "#2d3436",
-    marginBottom: 15,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -7,23 +7,62 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { UserContext } from "../../context/UserContext";
 
 const UsernameSetup = () => {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const { setUsername, setPreferences } = useContext(UserContext);
 
-  const handleNext = () => {
-    const trimmed = username.trim();
-    if (trimmed.length > 0) {
-      router.push("/questionnaire");
-    } else {
-      alert("Please enter a username");
+  const [usernameInput, setUsernameInput] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const checkUsernameExists = async (username) => {
+    try {
+      const response = await fetch(`http://192.168.18.13:3001/api/preferences/${encodeURIComponent(username)}`);
+      if (response.status === 404) {
+        // User not found => new user
+        return null;
+      }
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      alert("Network error, please try again.");
+      return null;
     }
   };
 
-  const isDisabled = username.trim().length === 0;
+  const handleNext = async () => {
+    const trimmed = usernameInput.trim();
+    if (trimmed.length === 0) {
+      alert("Please enter a username");
+      return;
+    }
+
+    setLoading(true);
+    const userPref = await checkUsernameExists(trimmed);
+    setLoading(false);
+
+    setUsername(trimmed);
+
+    if (userPref) {
+      setPreferences({
+        preferences: userPref.preferences,
+        fabricPreferences: userPref.fabricPreferences,
+        dealBreakers: userPref.dealBreakers,
+      });
+      router.push("/(dashboard)/shopping");
+    } else {
+      router.push("/(auth)/questionnaire");
+    }
+  };
+
+  const isDisabled = usernameInput.trim().length === 0 || loading;
 
   return (
     <KeyboardAvoidingView
@@ -35,11 +74,13 @@ const UsernameSetup = () => {
         style={styles.input}
         placeholder="Your username"
         placeholderTextColor="#999"
-        value={username}
-        onChangeText={setUsername}
+        value={usernameInput}
+        onChangeText={setUsernameInput}
         autoCapitalize="none"
         autoCorrect={false}
+        editable={!loading}
       />
+      {loading && <ActivityIndicator size="small" color="#2C6E49" style={{ marginBottom: 20 }} />}
       <Pressable
         onPress={handleNext}
         disabled={isDisabled}
@@ -49,7 +90,7 @@ const UsernameSetup = () => {
           isDisabled && styles.disabledButton,
         ]}
       >
-        <Text style={styles.buttonText}>Next</Text>
+        <Text style={styles.buttonText}>{loading ? "Checking..." : "Next"}</Text>
       </Pressable>
     </KeyboardAvoidingView>
   );
