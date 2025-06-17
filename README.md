@@ -86,15 +86,12 @@ PokeCoders is a mobile app that helps users make ethical fashion choices by rati
 To connect your local frontend with your local backend server, you must manually update the IP address in the following files:
 
 ### Files to update:
-- `app/(auth)/usernamesetup.js`  
-- `app/(auth)/questionnaire.js`
+- `app/config.js`
 
 ### What to change:
 
-Search for this line or similar in both files:
-
 ```js
-const response = await fetch("http://192.168.18.13:3001/api/preferences/", {
+export const BACKEND_URL = "http://192.168.18.13:3001";
 ```
 
 Change the IP (`192.168.18.13`) to your own **local IP address** (on the same WiFi network). You can find it with:
@@ -107,14 +104,13 @@ ipconfig      # Windows
 **For example:**
 
 ```js
-const response = await fetch("http://192.168.1.5:3001/api/preferences/", {
+export const BACKEND_URL = "http://192.168.10.141:3001";
 ```
 
-> ✅ **Tip:** Consider using a global config file or environment variable to avoid hardcoding IP addresses across multiple files.
 
 ## Usage
 
-Run the app on a device or emulator via Expo.
+Run the app on a device or emulator via Expo Go.
 
 Complete onboarding questionnaire to personalise preferences.
 
