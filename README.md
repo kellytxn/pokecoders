@@ -38,8 +38,7 @@ pokecoders is a mobile app that helps users make ethical fashion choices by rati
 
 - **Frontend:** React Native, Expo Router  
 - **Backend:** Node.js, Express  
-- **Database:** MongoDB  
-- **Authentication:** Firebase Authentication  
+- **Database:** MongoDB
 - **Other:** Barcode scanning, push notifications  
 
 ---
@@ -51,8 +50,7 @@ pokecoders is a mobile app that helps users make ethical fashion choices by rati
 - Node.js >= 16  
 - npm or yarn  
 - Expo CLI (`npm install -g expo-cli`)  
-- MongoDB instance (local or cloud)  
-- Firebase project for Authentication  
+- MongoDB instance (local)  
 
 ### Installation
 
@@ -64,42 +62,44 @@ pokecoders is a mobile app that helps users make ethical fashion choices by rati
 
 2. Install dependencies:
 
-cd frontend
-npm install
-cd ../backend
-npm install
+   ```bash
+   cd frontend
+   npm install
+   cd ../backend
+   npm install
 
 3. Create .env files in frontend and backend folders with your configuration (e.g., MongoDB URI, Firebase keys).
 
 4. Start the backend server:
 
-cd backend
-npm start
+   ```bash
+   cd backend
+   npm start
 
 5. Start the frontend app:
 
-cd ../frontend
-expo start
-
-## Project Structure
-
-pokecoders/
-├── backend/                # API server (Node.js + Express)
-├── frontend/               # React Native app source code
-├── datasets/               # Datasets (if any)
-├── mockups/                # Design mockups and wireframes
-├── README.md               # Project overview and instructions
-└── LICENSE                 # License file
+   ```bash
+   cd ../frontend
+   expo start
 
 ## Usage
 
 Run the app on a device or emulator via Expo.
 
-Complete onboarding questionnaire to personalize preferences.
+Complete onboarding questionnaire to personalise preferences.
 
 Browse shopping feed with sustainability scores.
 
 Scan receipts to claim points for offline purchases.
 
 Redeem points for rewards to encourage ethical shopping habits.
+
+## Project Structure
+
+   ```bash
+   pokecoders/
+   ├── backend/                # API server (Node.js + Express)
+   ├── app/                    # React Native app source code
+   ├── README.md               # Project overview and instructions
+
 
