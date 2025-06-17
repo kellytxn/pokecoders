@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { UserContext } from "../../context/UserContext";
+import { BACKEND_URL } from "../config";
 
 const questions = [
   {
@@ -90,7 +91,7 @@ const Questionnaire = () => {
     };
 
     try {
-      const response = await fetch("http://192.168.18.13:3001/api/preferences/", {
+      const response = await fetch(`${BACKEND_URL}/api/preferences/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

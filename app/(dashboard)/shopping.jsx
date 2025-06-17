@@ -17,9 +17,9 @@ import axios from "axios";
 import { computeSustainabilityScore } from "../../utils/scorer";
 import { allProducts } from "../../context/products";
 import { UserContext } from "../../context/UserContext";
+import { BACKEND_URL } from "../config";
 
 const { width } = Dimensions.get("window");
-const BACKEND_URL = "http://192.168.10.141:3001";
 
 function getScoreColor(score) {
   if (score <= 1.5) return "#e57373";   // soft red - poor

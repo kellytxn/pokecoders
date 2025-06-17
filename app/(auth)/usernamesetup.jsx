@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { UserContext } from "../../context/UserContext";
+import { BACKEND_URL } from "../config";
 
 const UsernameSetup = () => {
   const router = useRouter();
@@ -21,7 +22,7 @@ const UsernameSetup = () => {
 
   const checkUsernameExists = async (username) => {
     try {
-      const response = await fetch(`http://192.168.18.13:3001/api/preferences/${encodeURIComponent(username)}`);
+      const response = await fetch(`${BACKEND_URL}/api/preferences/${encodeURIComponent(username)}`);
       if (response.status === 404) {
         // User not found => new user
         return null;
