@@ -12,7 +12,7 @@ const Index = () => {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push("/usernamesetup");
+    router.push("/(auth)/usernamesetup");
   };
 
   return (
