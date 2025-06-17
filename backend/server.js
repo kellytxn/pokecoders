@@ -4,7 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const preferenceRoutes = require("./routes/userpreferences");
-const userScoreRoutes = require("./src/routes/userScore");
+const userScoreRoutes = require("./routes/userScore");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,7 +18,8 @@ app.use("/api/preferences", preferenceRoutes);
 app.use("/api/score", userScoreRoutes);
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
     app.listen(PORT, () => {

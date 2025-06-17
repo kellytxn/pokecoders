@@ -8,15 +8,67 @@ import {
   ScrollView,
   Image,
   Alert,
+  Platform,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 const Reward = () => {
   const [userPoints, setUserPoints] = useState(1250);
   const [redeemedVouchers, setRedeemedVouchers] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleScanPress = () => {
-    console.log("Scan receipt pressed");
+  const requestCameraPermission = async () => {
+    if (Platform.OS !== "web") {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      return status === "granted";
+    }
+    return false;
+  };
+
+  const simulateReceiptProcessing = () => {
+    const amount = (Math.random() * 90 + 10).toFixed(2);
+    return parseFloat(amount);
+  };
+
+  const handleScanPress = async () => {
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      Alert.alert(
+        "Permission required",
+        "Camera permission is needed to scan receipts"
+      );
+      return;
+    }
+
+    setIsProcessing(true);
+
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      Alert.alert("Processing", "Scanning your receipt...");
+
+      setTimeout(() => {
+        const amount = simulateReceiptProcessing();
+        const pointsEarned = Math.floor(amount);
+        setUserPoints((prev) => prev + pointsEarned);
+        setIsProcessing(false);
+
+        Alert.alert(
+          "Success!",
+          `You earned ${pointsEarned} points from your $${amount.toFixed(
+            2
+          )} purchase!`
+        );
+      }, 2000);
+    } else {
+      setIsProcessing(false);
+    }
   };
 
   const handleRedeem = () => {
@@ -26,7 +78,7 @@ const Reward = () => {
         ...prev,
         { id: Date.now(), title: "$5 Gift Card" },
       ]);
-      Alert.alert("Success", "You’ve redeemed a $5 Gift Card!");
+      Alert.alert("Success", "You've redeemed a $5 Gift Card!");
     }
   };
 
@@ -36,8 +88,16 @@ const Reward = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Rewards</Text>
-        <TouchableOpacity onPress={handleScanPress} style={styles.scanButton}>
-          <Ionicons name="camera" size={26} color="#2c3e50" />
+        <TouchableOpacity
+          onPress={handleScanPress}
+          style={styles.scanButton}
+          disabled={isProcessing}
+        >
+          <Ionicons
+            name="camera"
+            size={26}
+            color={isProcessing ? "#ccc" : "#2c3e50"}
+          />
         </TouchableOpacity>
       </View>
 
@@ -117,8 +177,6 @@ const Reward = () => {
     </SafeAreaView>
   );
 };
-
-export default Reward;
 
 const styles = StyleSheet.create({
   container: {
@@ -250,3 +308,5 @@ const styles = StyleSheet.create({
     color: "#2c3e50",
   },
 });
+
+export default Reward;

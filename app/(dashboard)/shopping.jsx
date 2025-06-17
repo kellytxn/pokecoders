@@ -8,24 +8,24 @@ import {
   Dimensions,
   SafeAreaView,
   Alert,
-  Linking
+  Linking,
 } from "react-native";
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import axios from "axios";
 import { computeSustainabilityScore } from "../../utils/scorer";
-import { allProducts } from "../../context/products";
 import { UserContext } from "../../context/UserContext";
 import { BACKEND_URL } from "../config";
 
 const { width } = Dimensions.get("window");
+const allProducts = require("../../context/products");
 
 function getScoreColor(score) {
-  if (score <= 1.5) return "#e57373";   // soft red - poor
-  if (score <= 3.0) return "#ffb74d";   // warm amber - moderate
-  if (score <= 4.4) return "#81c784";   // fresh green - good
-  return "#64b5f6";                     // light blue - excellent
+  if (score <= 1.5) return "#e57373"; // soft red - poor
+  if (score <= 3.0) return "#ffb74d"; // warm amber - moderate
+  if (score <= 4.4) return "#81c784"; // fresh green - good
+  return "#64b5f6"; // light blue - excellent
 }
 
 // Shopping List Screen
@@ -34,7 +34,6 @@ const ShoppingList = ({ navigation }) => {
   const userId = user?.id;
   const [products, setProducts] = useState(allProducts);
   const [viewTimers, setViewTimers] = useState({});
-
 
   const trackBehaviour = async (action, productId) => {
     if (!userId) return;
@@ -45,7 +44,7 @@ const ShoppingList = ({ navigation }) => {
         CLICK: 2,
         VIEW_10S: 3,
         ADD_TO_CART: 5,
-        PURCHASE: 10
+        PURCHASE: 10,
       };
 
       await axios.post(`${BACKEND_URL}/api/score/updateScore`, {
@@ -57,31 +56,33 @@ const ShoppingList = ({ navigation }) => {
       console.error("Error updating score:", error);
       Alert.alert("Error", "Failed to update scores");
     }
-  }
+  };
 
   const sortedProducts = async () => {
     if (!userId) return;
 
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/score/products/${userId}`);
+      const response = await axios.get(
+        `${BACKEND_URL}/api/score/products/${userId}`
+      );
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
       Alert.alert("Error", "Failed to load products");
     }
-  }
-  
+  };
+
   const handleProductPress = (product) => {
     trackBehaviour("CLICK", product.id);
     navigation.navigate("ProductDetail", { product });
-  }
+  };
 
   const handleAddToCart = (productId) => {
     trackBehaviour("ADD_TO_CART", productId);
     Alert.alert("Added to Cart", "Item has been added to your cart");
 
     // TO BE WRITTEN: SCREEN AFTER CLICKING ADD TO CART
-  }
+  };
 
   useEffect(() => {
     sortedProducts();
@@ -89,18 +90,18 @@ const ShoppingList = ({ navigation }) => {
 
   useEffect(() => {
     const timers = {};
-    
-    products.forEach(product => {
+
+    products.forEach((product) => {
       timers[product.id] = {
         3: setTimeout(() => trackBehaviour("VIEW_3S", product.id), 3000),
-        10: setTimeout(() => trackBehaviour("VIEW_10S", product.id), 10000)
+        10: setTimeout(() => trackBehaviour("VIEW_10S", product.id), 10000),
       };
     });
-    
+
     setViewTimers(timers);
-    
+
     return () => {
-      Object.values(timers).forEach(timerObj => {
+      Object.values(timers).forEach((timerObj) => {
         clearTimeout(timerObj[3]);
         clearTimeout(timerObj[10]);
       });
@@ -109,13 +110,12 @@ const ShoppingList = ({ navigation }) => {
 
   useEffect(() => {
     return () => {
-      Object.values(viewTimers).forEach(timerObj => {
+      Object.values(viewTimers).forEach((timerObj) => {
         clearTimeout(timerObj[3]);
         clearTimeout(timerObj[10]);
       });
     };
   }, [products]);
-
 
   return (
     <ScrollView style={styles.container}>
@@ -157,7 +157,7 @@ const ShoppingList = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.addToCartButton}
                 onPress={() => handleAddToCart(product.id)}
               >
@@ -249,7 +249,6 @@ const ProductDetail = ({ route }) => {
 const Stack = createStackNavigator();
 
 const Shopping = () => {
-
   return (
     <Stack.Navigator
       screenOptions={{
@@ -351,15 +350,15 @@ const styles = StyleSheet.create({
     color: "#2d3436",
   },
   addToCartButton: {
-    backgroundColor: '#e17055',
+    backgroundColor: "#e17055",
     padding: 8,
-    alignItems: 'center',
+    alignItems: "center",
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
   addToCartText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   // Detail Screen styles
 
