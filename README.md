@@ -25,8 +25,9 @@ PokeCoders is a mobile app that helps users make ethical fashion choices by rati
 ## Features
 
 - Onboarding questionnaire for personalised preferences  
-- Sustainability scoring algorithm considering fabric, ethical causes, and deal breakers  
-- Shopping feed with product ratings and recommendations  
+- Sustainability scoring algorithm considering fabric, ethical causes, and deal breakers
+- Shopping feed with product ratings and recommendations
+- Personalised shopping experience anticipating consumer preferences
 - Receipt scanning for offline purchase points  
 - Points tracking and reward redemption system  
 - Interactive dashboards and notifications  
