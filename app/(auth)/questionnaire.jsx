@@ -102,7 +102,7 @@ const Questionnaire = () => {
         return;
       }
 
-      router.push("/(dashboard)/shopping");i
+      router.push("/(dashboard)/shopping");
 
     } catch (error) {
       alert("Network error. Please try again.");
