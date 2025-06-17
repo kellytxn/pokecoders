@@ -72,10 +72,14 @@ PokeCoders is a mobile app that helps users make ethical fashion choices by rati
    ```
 
 3. Create a .env file in the backend folder with your configuration
-   Add the following to your .env file:
 
-MONGO_URI=mongodb+srv://pokecoders:pokecoders123@fanryan.vvb74qj.mongodb.net/pokecodersdb?retryWrites=true&w=majority&appName=fanryan
-PORT=3001
+### Add the following to your .env file:
+
+```js
+MONGO_URI =
+  "mongodb+srv://pokecoders:pokecoders123@fanryan.vvb74qj.mongodb.net/pokecodersdb?retryWrites=true&w=majority&appName=fanryan";
+PORT = 3001;
+```
 
 4. Start the backend server:
 
