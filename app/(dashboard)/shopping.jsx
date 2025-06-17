@@ -1,4 +1,5 @@
 import {
+  Alert,
   View,
   Text,
   StyleSheet,
@@ -7,9 +8,13 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useContext } from "react";
 
 const { width } = Dimensions.get("window");
+const BACKEND_URL = "http://192.168.10.141:3001";
 
 const recommendedProducts = [
   {
@@ -68,7 +73,90 @@ const recommendedProducts = [
     rating: 4.8,
   },
 ];
+
 const Shopping = () => {
+  const trackBehaviour = async (action, productId) => {
+    try {
+      const SCORE_WEIGHTS = {
+        VIEW_3S: 1,
+        CLICK: 2,
+        VIEW_10S: 3,
+        ADD_TO_CART: 5,
+        PURCHASE: 10
+      };
+
+      const response = await axios.post(`${BACKEND_URL}/updateScore`, {
+        userId: ,
+        productId: productId,
+        scoreValue: SCORE_WEIGHTS[action]
+      });
+    } catch (error) {
+      console.error("Error updating score:", error);
+      Alert.alert("Error", "Failed to update scores");
+    }
+  }
+
+  const handleProductPress = (productId) => {
+    trackBehaviour("CLICK", productId);
+
+    // TO BE WRITTEN: PRODUCT DETAIL SCREEN AFTER CLICKING INTO PRODUCT
+  }
+
+  const handleAddToCart = (productId) => {
+    trackBehaviour("ADD_TO_CART", productId);
+
+    // TO BE WRITTEN: SCREEN AFTER CLICKING ADD TO CART
+  }
+
+  const ProductCard = ({ product }) => {
+    const viewTimer = useRef(null);
+    
+    useEffect(() => {
+      viewTimer.current = setTimeout(() => {
+        trackBehaviour("VIEW_3S", product.id);
+        
+        viewTimer.current = setTimeout(() => {
+          trackBehaviour("VIEW_10S", product.id);
+        }, 7000);
+      }, 3000);
+
+      return () => {
+        clearTimeout(viewTimer.current);
+      };
+    }, [product.id]);
+
+    return (
+      <TouchableOpacity
+        key={product.id}
+        style={styles.productCard}
+        activeOpacity={0.8}
+        onPress={() => handleProductPress(product.id)}
+      >
+        <Image
+          source={{ uri: product.image }}
+          style={styles.productImage}
+        />
+        <View style={styles.productDetails}>
+          <Text style={styles.productName} numberOfLines={1}>
+            {product.name}
+          </Text>
+          <View style={styles.priceRatingContainer}>
+            <Text style={styles.productPrice}>{product.price}</Text>
+            <View style={styles.ratingContainer}>
+              <Text style={styles.ratingText}>★ {product.rating}</Text>
+            </View>
+          </View>
+          <TouchableOpacity 
+            style={styles.addToCartButton}
+            onPress={() => handleAddToCart(product.id)}
+          >
+            <Text style={styles.addToCartText}>Add to Cart</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView style={styles.header}>
@@ -77,28 +165,11 @@ const Shopping = () => {
 
       <View style={styles.productsGrid}>
         {recommendedProducts.map((product) => (
-          <TouchableOpacity
+          <ProductCard
             key={product.id}
-            style={styles.productCard}
-            activeOpacity={0.8}
-          >
-            <Image
-              source={{ uri: product.image }}
-              style={styles.productImage}
-            />
-            <View style={styles.productDetails}>
-              <Text style={styles.productName} numberOfLines={1}>
-                {product.name}
-              </Text>
-              <View style={styles.priceRatingContainer}>
-                <Text style={styles.productPrice}>{product.price}</Text>
-                <View style={styles.ratingContainer}>
-                  <Text style={styles.ratingText}>★ {product.rating}</Text>
-                </View>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+            product={product}
+          />
+          ))}
       </View>
     </ScrollView>
   );
@@ -175,6 +246,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     color: "white",
+  },
+  addToCartButton: {
+    backgroundColor: "#e17055",
+    borderRadius: 6,
+    paddingVertical: 8,
+    marginTop: 8,
+    alignItems: 'center',
+  },
+  addToCartText: {
+    color: "white",
+    fontWeight: "600",
   },
   contentSection: {
     padding: 20,
