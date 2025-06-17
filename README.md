@@ -1,6 +1,6 @@
 # pokecoders
 
-An ethical shopping and rewards platform that rates fashion products based on sustainability and motivates conscious consumerism through personalized insights and real-time shopping integration.
+An ethical shopping and rewards platform that rates fashion products based on sustainability and motivates conscious consumerism through personalised insights and real-time shopping integration.
 
 ---
 
@@ -68,19 +68,19 @@ pokecoders is a mobile app that helps users make ethical fashion choices by rati
    cd ../backend
    npm install
 
-3. Create .env files in frontend and backend folders with your configuration (e.g., MongoDB URI, Firebase keys).
+3. Create .env files in frontend and backend folders with your configuration (e.g., MongoDB URI.
 
 4. Start the backend server:
 
    ```bash
    cd backend
-   npm start
+   node server.js
 
 5. Start the frontend app:
 
    ```bash
-   cd ../frontend
-   expo start
+   cd pokecoders
+   npx expo start
 
 ## Usage
 
