@@ -85,8 +85,8 @@ PokeCoders is a mobile app that helps users make ethical fashion choices by rati
 To connect your local frontend with your local backend server, you must manually update the IP address in the following files:
 
 ### Files to update:
-- `app/(auth)/UsernameSetup.js`  
-- `app/(auth)/Questionnaire.js`
+- `app/(auth)/usernamesetup.js`  
+- `app/(auth)/questionnaire.js`
 
 ### What to change:
 
