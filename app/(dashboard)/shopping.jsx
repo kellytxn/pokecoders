@@ -32,7 +32,7 @@ function getScoreColor(score) {
 const ShoppingList = ({ navigation }) => {
   const { user } = useContext(UserContext);
   const userId = user?.id;
-  const [products, setProducts] = useState(allProducts);
+  const [products, setProducts] = useState([]);
   const [viewTimers, setViewTimers] = useState({});
 
   const trackBehaviour = async (action, productId) => {
@@ -65,16 +65,18 @@ const ShoppingList = ({ navigation }) => {
       const response = await axios.get(
         `${BACKEND_URL}/api/score/products/${userId}`
       );
+      setProducts(response.data);
 
-      if (response.data) {
+      /*if (response.data) {
         setProducts(response.data);  
       } else {
         setProducts(allProducts);
-      }
+      }*/
       
     } catch (error) {
       console.error("Error fetching products:", error);
       Alert.alert("Error", "Failed to load products");
+      setProducts(allProducts);
     }
   };
 
