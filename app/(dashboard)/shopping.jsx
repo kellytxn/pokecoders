@@ -52,13 +52,21 @@ const ShoppingList = ({ navigation }) => {
         productId: productId,
         scoreValue: SCORE_WEIGHTS[action],
       });
+
+      if (userId) {
+        const response = await axios.get(
+          `${BACKEND_URL}/api/score/products/${userId}`
+        );
+      
+        setProducts(response.data);
+      } else setProducts(allProducts);
     } catch (error) {
       console.error("Error updating score:", error);
       Alert.alert("Error", "Failed to update scores");
     }
   };
 
-  const sortedProducts = async () => {
+  /*const sortedProducts = async () => {
     if (!userId) return;
 
     try {
@@ -71,7 +79,7 @@ const ShoppingList = ({ navigation }) => {
       Alert.alert("Error", "Failed to load products");
       setProducts(allProducts);
     }
-  };
+  };*/
 
   const handleProductPress = (product) => {
     trackBehaviour("CLICK", product.id);
@@ -83,9 +91,9 @@ const ShoppingList = ({ navigation }) => {
     Alert.alert("Added to Cart", "Item has been added to your cart");
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     sortedProducts();
-  }, [userId]);
+  }, [userId]);*/
 
   useEffect(() => {
     const timers = {};
