@@ -57,6 +57,7 @@ router.post("/updateScore", async (req, res) => {
 router.get("/products/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
+    let productsWithScores = [...AllProducts];
     
     // get all product scores for this user
     const userScores = await UserScore.find({ userId });
@@ -68,7 +69,7 @@ router.get("/products/:userId", async (req, res) => {
     });
     
     // merge products with scores
-    const productsWithScores = AllProducts.map(product => ({
+    productsWithScores = AllProducts.map(product => ({
       ...product,
       userScore: scoreMap.get(product.id) || 0
     }));
