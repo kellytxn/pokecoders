@@ -39,7 +39,7 @@ PokeCoders is a mobile app that helps users make ethical fashion choices by rati
 - **Frontend:** React Native, Expo Router
 - **Backend:** Node.js, Express
 - **Database:** MongoDB
-- **Other:** Barcode scanning, push notifications
+- **Other:** Barcode scanning, push notifications, web scraping
 
 ---
 
