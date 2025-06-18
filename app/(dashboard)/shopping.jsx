@@ -32,7 +32,7 @@ function getScoreColor(score) {
 const ShoppingList = ({ navigation }) => {
   const { user } = useContext(UserContext);
   const userId = user?.id;
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(allProducts);
   const [viewTimers, setViewTimers] = useState({});
 
   const trackBehaviour = async (action, productId) => {
