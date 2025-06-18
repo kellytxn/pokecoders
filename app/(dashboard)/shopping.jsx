@@ -13,7 +13,7 @@ import {
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import axios from "axios";
+import axios, { all } from "axios";
 import { computeSustainabilityScore } from "../../utils/scorer";
 import { UserContext } from "../../context/UserContext";
 import { BACKEND_URL } from "../config";
@@ -32,7 +32,7 @@ function getScoreColor(score) {
 const ShoppingList = ({ navigation }) => {
   const { user } = useContext(UserContext);
   const userId = user?.id;
-  const [products, setProducts] = useState(allProducts);
+  const [products, setProducts] = useState([]);
   const [viewTimers, setViewTimers] = useState({});
 
   const trackBehaviour = async (action, productId) => {
@@ -65,7 +65,13 @@ const ShoppingList = ({ navigation }) => {
       const response = await axios.get(
         `${BACKEND_URL}/api/score/products/${userId}`
       );
-      setProducts(response.data);
+
+      if (response.data) {
+        setProducts(response.data);  
+      } else {
+        setProducts(allProducts);
+      }
+      
     } catch (error) {
       console.error("Error fetching products:", error);
       Alert.alert("Error", "Failed to load products");
@@ -80,8 +86,6 @@ const ShoppingList = ({ navigation }) => {
   const handleAddToCart = (productId) => {
     trackBehaviour("ADD_TO_CART", productId);
     Alert.alert("Added to Cart", "Item has been added to your cart");
-
-    // TO BE WRITTEN: SCREEN AFTER CLICKING ADD TO CART
   };
 
   useEffect(() => {
